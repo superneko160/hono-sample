@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  hono-sample:
+    build: .
+    container_name: hono-sample
+    volumes:
+      - ../:/hono-sample
+    networks:
+      - hono-sample
+    command: bash
+    stdin_open: true
+    tty: true
+    restart: 'no'
+
+networks:
+  hono-sample:
+    driver: bridge
