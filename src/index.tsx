@@ -1,7 +1,7 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { jsx } from 'hono/jsx'
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
+import { SpaceImage } from './components/SpaceImage'
 
 const app = new Hono()
 
@@ -33,18 +33,6 @@ app.get('/picture', async (c) => {
     </div>
   )
 })
-
-/**
- * === Components ===
- */
-/**
- * 宇宙の画像を表示するコンポーネント
- * @param props 
- * @returns 
- */
-const SpaceImage = (props: {url: string}) => (
-  <img src={props.url} />
-)
 
 /**
  * === Server ===
