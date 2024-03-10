@@ -1,18 +1,18 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { Pool } from 'pg'
+import postgres from 'postgres'
+import { drizzle } from "drizzle-orm/postgres-js"
+import { users } from "../drizzle/schema"
+import { execute } from "drizzle-kit/orm-extenstions/d1-driver/wrangler-client";
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
 import { SpaceImage } from './components/SpaceImage'
 
-const app = new Hono()
+const client = postgres(
+  `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
+)
+const db = drizzle(client, { logger: true })
 
-const pool = new Pool({
-  user: 'postgres',
-  host: 'xxx.xx.x.x',
-  database: 'sample',
-  password: 'password',
-  port: 5432,
-})
+const app = new Hono()
 
 /**
  * === Rooting ===
@@ -44,10 +44,19 @@ app.get('/picture', async (c) => {
 })
 
 // /users
-app.get('/users', async(c) => {
-  const { rows } = await pool.query('select * from users')
-  return c.json(rows)
-});
+app.get('/users', async (c) => {
+  const result = await db.select(
+    {
+      id: users.id,
+      name: users.name,
+      age: users.age
+    }
+  )
+  .from(users)
+  .execute()
+
+    return c.json(result)
+})
 
 /**
  * === Server ===

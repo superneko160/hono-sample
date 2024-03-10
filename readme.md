@@ -1,6 +1,6 @@
 # Hono-Sample
 
-Hono + PostgreSQL
+Hono + PostgreSQL + Drizzle ORM
 
 ## Setting
 
@@ -42,16 +42,15 @@ docker network inspect network-id
 }
 ```
 
-DB host settings for index.tsx
+DB host settings for .env
 
-```js
-const pool = new Pool({
-  user: 'postgres',
-  host: 'xxx.xx.x.x',  // Setting IPv4Address
-  database: 'sample',
-  password: 'password',
-  port: 5432,
-})
+```
+DB_USER=postgres
+DB_PASSWORD=password
+DB_HOST=xxx.xx.x.x  // Setting IPv4Address
+DB_PORT=5432
+DB_NAME=sample
+
 ```
 
 ### Build and launch docker container
