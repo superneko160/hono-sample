@@ -9,10 +9,31 @@ services:
     networks:
       - hono-sample
     command: bash
-    stdin_open: true
+    # stdin_open: true
     tty: true
-    restart: 'no'
+    # restart: 'no'
+    ports:
+      - 3000:3000
+
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sample
+    volumes:
+      - ../db_data:/var/lib/posrgresql/data
+      - ../initdb:/docker-entrypoint-initdb.d
+    networks:
+      - hono-sample
 
 networks:
   hono-sample:
-    driver: bridge
+    external: true
+    # driver: bridge
+
+volumes:
+  db_data: {}

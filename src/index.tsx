@@ -1,9 +1,18 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import { Pool } from 'pg'
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
 import { SpaceImage } from './components/SpaceImage'
 
 const app = new Hono()
+
+const pool = new Pool({
+  user: 'postgres',
+  host: 'xxx.xx.x.x',
+  database: 'sample',
+  password: 'password',
+  port: 5432,
+})
 
 /**
  * === Rooting ===
@@ -33,6 +42,12 @@ app.get('/picture', async (c) => {
     </div>
   )
 })
+
+// /users
+app.get('/users', async(c) => {
+  const { rows } = await pool.query('select * from users')
+  return c.json(rows)
+});
 
 /**
  * === Server ===
