@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import postgres from 'postgres'
 import { drizzle } from "drizzle-orm/postgres-js"
+import { eq } from "drizzle-orm"
 import { users } from "../drizzle/schema"
 import { execute } from "drizzle-kit/orm-extenstions/d1-driver/wrangler-client";
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
@@ -19,7 +20,9 @@ const app = new Hono()
  */
 // root
 app.get('/', (c) => {
-  return c.text('Hello, Hono!!')
+  return c.html(
+    <div>Hello, Hono!!</div>
+  )
 })
 
 // 404
@@ -43,19 +46,85 @@ app.get('/picture', async (c) => {
   )
 })
 
-// /users
-app.get('/users', async (c) => {
-  const result = await db.select(
-    {
-      id: users.id,
-      name: users.name,
-      age: users.age
-    }
+// / create
+app.get('/create', (c) => {
+  return c.html(
+    <div>
+      <form action="user" method="post" required>
+        username: <input type="text" name="user" required /><br />
+        age: <input type="number" name="age" /><br />
+        <button type="submit">CREATE USER</button>
+      </form>
+    </div>
   )
-  .from(users)
-  .execute()
+})
+
+// Create
+app.post("/user", async (c) => {
+  const body = await c.req.parseBody()
+  console.log(body)
+
+  await db.insert(users)
+      .values({
+        name: body.user,
+        age: body.age
+      })
+
+  return c.json({message: "ok", ok: true})
+})
+
+// Read
+app.get('/users/:id?', async (c) => {
+  let result = [];
+  if (!c.req.param("id")) {
+    result = await db.select(
+      {
+        id: users.id,
+        name: users.name,
+        age: users.age
+      }
+    )
+    .from(users)
+  }
+  else {
+    result = await db.select(
+      {
+        id: users.id,
+        name: users.name,
+        age: users.age
+      }
+    )
+    .from(users)
+    .where(eq(users.id, c.req.param("id")))
+  }
 
     return c.json(result)
+})
+
+// Update
+app.put("/user/:id", async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.parseBody()
+  console.log(body)
+
+  await db.update(users)
+      .set({
+        name: body.name,
+        age: body.age
+      })
+      .where(eq(users.id, id))
+
+  return c.json({message: "ok", ok: true})
+})
+
+// Delete
+app.delete("/user/:id", async (c) => {
+  const id = c.req.param("id");
+
+  await db.delete(users)
+      .where(eq(users.id, id))
+
+  return c.json({message: "ok", ok: true})
 })
 
 /**
