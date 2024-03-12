@@ -7,6 +7,7 @@ import { users } from "../drizzle/schema"
 import { execute } from "drizzle-kit/orm-extenstions/d1-driver/wrangler-client";
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
 import { SpaceImage } from './components/SpaceImage'
+import { CreateForm } from './components/CreateForm'
 
 const client = postgres(
   `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
@@ -50,23 +51,21 @@ app.get('/picture', async (c) => {
 app.get('/create', (c) => {
   return c.html(
     <div>
-      <form action="user" method="post" required>
-        username: <input type="text" name="user" required /><br />
-        age: <input type="number" name="age" /><br />
-        <button type="submit">CREATE USER</button>
-      </form>
+      <CreateForm />
     </div>
   )
 })
 
+/**
+ * === Rooting (Api) ===
+ */
 // Create
 app.post("/user", async (c) => {
   const body = await c.req.parseBody()
-  console.log(body)
 
   await db.insert(users)
       .values({
-        name: body.user,
+        name: body.name,
         age: body.age
       })
 
@@ -102,27 +101,27 @@ app.get('/users/:id?', async (c) => {
 })
 
 // Update
-app.put("/user/:id", async (c) => {
-  const id = c.req.param("id");
+// idと一致するデータがあった場合、そのデータを更新（なかった場合もok返す）
+app.put("/user", async (c) => {
   const body = await c.req.parseBody()
-  console.log(body)
 
   await db.update(users)
       .set({
         name: body.name,
         age: body.age
       })
-      .where(eq(users.id, id))
+      .where(eq(users.id, body.id))
 
   return c.json({message: "ok", ok: true})
 })
 
 // Delete
-app.delete("/user/:id", async (c) => {
-  const id = c.req.param("id");
+// idと一致するデータがあった場合、そのデータを削除（なかった場合もok返す）
+app.delete("/user", async (c) => {
+  const body = await c.req.parseBody()
 
   await db.delete(users)
-      .where(eq(users.id, id))
+      .where(eq(users.id, body.id))
 
   return c.json({message: "ok", ok: true})
 })

@@ -104,3 +104,7 @@ psql -U postgres -d sample
 ## WebAPI
 
 [NASA Open API](https://api.nasa.gov/)
+
+## VSCode Extensions
+
+[Thunder Client](https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client)
