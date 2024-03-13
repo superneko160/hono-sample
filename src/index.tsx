@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm"
 import { users } from "../drizzle/schema"
 import { execute } from "drizzle-kit/orm-extenstions/d1-driver/wrangler-client";
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
+import { getUser, getUsers } from './utils/User'
 import { SpaceImage } from './components/SpaceImage'
 import { CreateForm } from './components/CreateForm'
 
@@ -73,37 +74,29 @@ app.post("/user", async (c) => {
 })
 
 // Read
-app.get('/users/:id?', async (c) => {
-  let result = [];
-  if (!c.req.param("id")) {
-    result = await db.select(
-      {
-        id: users.id,
-        name: users.name,
-        age: users.age
-      }
-    )
-    .from(users)
-  }
-  else {
-    result = await db.select(
-      {
-        id: users.id,
-        name: users.name,
-        age: users.age
-      }
-    )
-    .from(users)
-    .where(eq(users.id, c.req.param("id")))
-  }
+// idと一致するデータがあれば、そのユーザ情報を返す（なければ空のリストを返す）
+app.get('/user/:id', async (c) => {
+  const result = await getUser(db, c.req.param("id"))
+  return c.json(result)
+})
 
-    return c.json(result)
+// Read
+// idと一致するデータがあれば、そのユーザ情報を返す（なければ空のリストを返す）
+app.get('/users', async (c) => {
+  const result = await getUsers(db)
+  return c.json(result)
 })
 
 // Update
-// idと一致するデータがあった場合、そのデータを更新（なかった場合もok返す）
+// idと一致するデータがあった場合、そのデータを更新（なければ404返す）
 app.put("/user", async (c) => {
   const body = await c.req.parseBody()
+
+  const user = await getUser(db, body.id)
+
+  if (user.length === 0) {
+    return c.json({ message: "404 Not Found" }, 404);
+  }
 
   await db.update(users)
       .set({
@@ -116,9 +109,15 @@ app.put("/user", async (c) => {
 })
 
 // Delete
-// idと一致するデータがあった場合、そのデータを削除（なかった場合もok返す）
+// idと一致するデータがあった場合、そのデータを削除（なければ404返す）
 app.delete("/user", async (c) => {
   const body = await c.req.parseBody()
+
+  const user = await getUser(db, body.id)
+
+  if (user.length === 0) {
+    return c.json({ message: "404 Not Found" }, 404);
+  }
 
   await db.delete(users)
       .where(eq(users.id, body.id))
