@@ -28,13 +28,13 @@ app.get('/', (c) => {
 
 // 404
 app.notFound((c) => {
-  return c.text('Custom 404 Message', 404)
+  return c.json({message: "404 Not Found"}, 404)
 })
 
 // 500
 app.onError((err, c) => {
   console.error(`${err}`)
-  return c.text('Custom Error Message', 500)
+  return c.json({message: "500 Custom Error Message"}, 500)
 })
 
 // /picture
@@ -69,7 +69,7 @@ app.post("/user", async (c) => {
         age: body.age
       })
 
-  return c.json({message: "ok", ok: true})
+  return c.json({message: "ok"}, 201)
 })
 
 // Read
@@ -112,7 +112,7 @@ app.put("/user", async (c) => {
       })
       .where(eq(users.id, body.id))
 
-  return c.json({message: "ok", ok: true})
+  return c.json({message: "ok"})
 })
 
 // Delete
@@ -123,7 +123,7 @@ app.delete("/user", async (c) => {
   await db.delete(users)
       .where(eq(users.id, body.id))
 
-  return c.json({message: "ok", ok: true})
+  return c.json({message: "ok"})
 })
 
 /**
