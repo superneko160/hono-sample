@@ -1,6 +1,6 @@
 # Hono-Sample
 
-Hono + PostgreSQL + Drizzle ORM
+[Hono](https://hono.dev/) + [PostgreSQL](https://www.postgresql.org/) + [Drizzle ORM](https://orm.drizzle.team/)
 
 ## Setting
 
