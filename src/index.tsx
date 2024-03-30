@@ -9,6 +9,9 @@ import { fetchSpaceImage } from './utils/fetchSpaceImage'
 import { getUser, getUsers } from './utils/User'
 import { SpaceImage } from './components/SpaceImage'
 import { CreateForm } from './components/CreateForm'
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 const client = postgres(
   `postgresql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`
