@@ -30,7 +30,7 @@ NETWORK ID     NAME                       DRIVER    SCOPE
 Check network details
 
 ```bash
-docker network inspect network-id
+docker network inspect hono-sample
 ```
 
 ```bash
