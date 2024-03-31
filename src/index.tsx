@@ -9,7 +9,9 @@ import { fetchSpaceImage } from './utils/fetchSpaceImage'
 import { getUser, getUsers } from './utils/User'
 import { SpaceImage } from './components/SpaceImage'
 import { CreateForm } from './components/CreateForm'
+import { UploadForm } from "./components/UploadForm"
 import * as dotenv from 'dotenv'
+import { writeFile } from "fs/promises"
 
 dotenv.config()
 
@@ -32,13 +34,13 @@ app.get('/', (c) => {
 
 // 404
 app.notFound((c) => {
-  return c.json({message: "404 Not Found"}, 404)
+  return c.json({ message: "404 Not Found" }, 404)
 })
 
 // 500
 app.onError((err, c) => {
   console.error(`${err}`)
-  return c.json({message: "500 Custom Error Message"}, 500)
+  return c.json({ message: "500 Custom Error Message" }, 500)
 })
 
 // /picture
@@ -60,6 +62,15 @@ app.get('/create', (c) => {
   )
 })
 
+// /upload
+app.get('/upload', (c) => {
+  return c.html(
+    <div>
+      <UploadForm />
+    </div>
+  )
+})
+
 /**
  * === Rooting (Api) ===
  */
@@ -73,7 +84,7 @@ app.post("/user", async (c) => {
         age: body.age
       })
 
-  return c.json({message: "ok"}, 201)
+  return c.json({ message: "ok" }, 201)
 })
 
 // Read
@@ -108,7 +119,7 @@ app.put("/user", async (c) => {
       })
       .where(eq(users.id, body.id))
 
-  return c.json({message: "ok"})
+  return c.json({ message: "ok" })
 })
 
 // Delete
@@ -125,7 +136,21 @@ app.delete("/user", async (c) => {
   await db.delete(users)
       .where(eq(users.id, body.id))
 
-  return c.json({message: "ok"})
+  return c.json({ message: "ok" })
+})
+
+// /upload
+app.post('/upload', async (c) => {
+  const formData = await c.req.formData()
+  const file = formData.get('file')
+  const arr = await file.arrayBuffer()
+
+  // Note: fsのファイルパスの起点はnode.jsで実行しているファイルがあるディレクトリ
+  writeFile(`./images/${file.name}`, Buffer.from(arr), (e) => {
+    return c.json({ error: e.toString() }, 500)
+  })
+
+  return c.json({ message: "ok" })
 })
 
 /**
