@@ -1,6 +1,6 @@
 /**
  * ユーザの新規作成コンポーネント
- * @returns {JSX.Element} 画像を表示する要素
+ * @returns {JSX.Element} フォーム
  */
 export const CreateForm = () => (
   <form action="user" method="post" required>
