@@ -7,11 +7,13 @@ import { users } from "../drizzle/schema"
 import { execute } from "drizzle-kit/orm-extenstions/d1-driver/wrangler-client";
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
 import { getUser, getUsers } from './utils/User'
+import { getElements } from './utils/getElements'
 import { SpaceImage } from './components/SpaceImage'
 import { CreateForm } from './components/CreateForm'
 import { UploadForm } from "./components/UploadForm"
 import * as dotenv from 'dotenv'
-import { writeFile } from "fs/promises"
+import { writeFile, readFile } from "fs/promises"
+import { parse } from 'node-html-parser'
 
 dotenv.config()
 
@@ -146,11 +148,28 @@ app.post('/upload', async (c) => {
   const arr = await file.arrayBuffer()
 
   // Note: fsのファイルパスの起点はnode.jsで実行しているファイルがあるディレクトリ
-  writeFile(`./images/${file.name}`, Buffer.from(arr), (e) => {
+  writeFile(`./resources/images/${file.name}`, Buffer.from(arr), (e) => {
     return c.json({ error: e.toString() }, 500)
   })
 
   return c.json({ message: "ok" })
+})
+
+// /parse
+app.get('/parse', async (c) => {
+  // ファイルを読み込む
+  let filedata = await readFile('./resources/html/index.html', 'utf8')
+
+  // 以下の処理がなくても動作はするが、countElements関数内で余分な処理が走る
+  // 改行、タブを除去
+  filedata = filedata.replace(/\r?\n|\r|\t/g, '').trim()
+  // タグ内以外の空白を除去
+  filedata = filedata.replace(/>\s+</g, '><')
+
+  const root = parse(filedata)
+  const data = getElements(root)
+
+  return c.json({ message: "ok", data: data })
 })
 
 /**
