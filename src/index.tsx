@@ -8,6 +8,7 @@ import { execute } from "drizzle-kit/orm-extenstions/d1-driver/wrangler-client";
 import { fetchSpaceImage } from './utils/fetchSpaceImage'
 import { getUser, getUsers } from './utils/User'
 import { getElements } from './utils/getElements'
+import { trimHtml } from "./utils/trimHtml";
 import { SpaceImage } from './components/SpaceImage'
 import { CreateForm } from './components/CreateForm'
 import { UploadForm } from "./components/UploadForm"
@@ -161,10 +162,7 @@ app.get('/parse', async (c) => {
   let filedata = await readFile('./resources/html/index.html', 'utf8')
 
   // 以下の処理がなくても動作はするが、countElements関数内で余分な処理が走る
-  // 改行、タブを除去
-  filedata = filedata.replace(/\r?\n|\r|\t/g, '').trim()
-  // タグ内以外の空白を除去
-  filedata = filedata.replace(/>\s+</g, '><')
+  filedata = trimHtml(filedata)
 
   const root = parse(filedata)
   const data = getElements(root)
