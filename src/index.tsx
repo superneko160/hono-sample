@@ -15,6 +15,7 @@ import { UploadForm } from "./components/UploadForm"
 import * as dotenv from 'dotenv'
 import { writeFile, readFile } from "fs/promises"
 import { parse } from 'node-html-parser'
+import { JSDOM } from 'jsdom'
 
 dotenv.config()
 
@@ -168,6 +169,22 @@ app.get('/parse', async (c) => {
   const data = getElements(root)
 
   return c.json({ message: "ok", data: data })
+})
+
+// /hatena
+app.get('/hatena', async (c) => {
+  const dom = await JSDOM.fromURL("https://b.hatena.ne.jp/hotentry/it")
+  const nodeList = dom.window.document.querySelectorAll(
+    ".entrylist-contents-title a"
+  )
+  const items = Array.from(nodeList).map((node) => {
+    return {
+      title: node.title,
+      href: node.href,
+    }
+  })
+
+  return c.json({ message: "ok", data: items })
 })
 
 /**
