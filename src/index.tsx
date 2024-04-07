@@ -171,6 +171,33 @@ app.get('/parse', async (c) => {
   return c.json({ message: "ok", data: data })
 })
 
+// /note/h1
+// /note/h1,div
+app.get('/note/:tag', async (c) => {
+  const dom = await JSDOM.fromURL("https://note.com/")
+  const nodeList = dom.window.document.querySelectorAll(
+    c.req.param("tag")
+  )
+  const items = Array.from(nodeList).map((node) => {
+    // 属性名と値をすべて取得
+    const attributes = Array.from(node.attributes).map((attr) => {
+      return {
+        name: attr.name,
+        value: attr.value,
+      }
+    })
+
+    return {
+      tagname: node.tagName.toLowerCase(),
+      content: node.textContent.replace(/\s+/g, ""),
+      href: node.href,
+      attributes: attributes,
+    }
+  })
+
+  return c.json({ message: "ok", data: items })
+})
+
 // /hatena
 app.get('/hatena', async (c) => {
   const dom = await JSDOM.fromURL("https://b.hatena.ne.jp/hotentry/it")
