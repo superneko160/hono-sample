@@ -1,6 +1,9 @@
 # Hono-Sample
 
-[Hono](https://hono.dev/) + [PostgreSQL](https://www.postgresql.org/) + [Drizzle ORM](https://orm.drizzle.team/)
+- [Hono](https://hono.dev/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Drizzle ORM](https://orm.drizzle.team/)
+- [JSDOM](https://github.com/jsdom/jsdom)
 
 ## Setting
 
